@@ -1,0 +1,350 @@
+### =============================================================================
+### Salesforce Mock Server - Request Examples
+### =============================================================================
+### This file demonstrates all the ways to control mock responses.
+### Use with VS Code REST Client extension or JetBrains HTTP Client.
+###
+### Base URL: http://localhost:5100
+### =============================================================================
+
+@baseUrl = http://localhost:5100
+@apiVersion = v59.0
+
+### =============================================================================
+### 1. STANDARD SUCCESS RESPONSES
+### =============================================================================
+
+### Get Account - Standard success response
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+
+###
+
+### Get Contact - Standard success response
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Contact/003XX000004TmiDAAS
+Accept: application/json
+
+###
+
+### Validate Contract - Auto-approved (value <= 100,000)
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/validate
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-001",
+    "accountId": "001XX000003DGb2YAG",
+    "contractValue": 50000,
+    "currency": "USD"
+}
+
+###
+
+### Validate Contract - Pending manager approval (100,001 - 500,000)
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/validate
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-002",
+    "accountId": "001XX000003DGb2YAG",
+    "contractValue": 250000,
+    "currency": "USD"
+}
+
+###
+
+### Validate Contract - Rejected (> 500,000)
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/validate
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-003",
+    "accountId": "001XX000003DGb2YAG",
+    "contractValue": 1000000,
+    "currency": "USD"
+}
+
+###
+
+### Contract Notification - Echoes request data in response
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/notify
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-001",
+    "accountId": "001XX000003DGb2YAG",
+    "signedBy": "Jane Smith",
+    "signedAt": "2024-01-15T10:30:00Z"
+}
+
+###
+
+### =============================================================================
+### 2. HEADER-BASED CONTROL (X-Mock-Response)
+### =============================================================================
+
+### Simulate 500 Internal Server Error
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: fail
+
+###
+
+### Alternative: Use "error" instead of "fail"
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: error
+
+###
+
+### Simulate timeout (30 second delay)
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: timeout
+
+###
+
+### Simulate slow response (5 second delay)
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: slow
+
+###
+
+### Simulate 404 Not Found
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: not-found
+
+###
+
+### Simulate 401 Unauthorized
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: unauthorized
+
+###
+
+### Simulate 429 Rate Limit Exceeded
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: rate-limit
+
+###
+
+### Simulate 503 Service Unavailable
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Response: unavailable
+
+###
+
+### Header control works on POST requests too
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/validate
+Content-Type: application/json
+X-Mock-Response: fail
+
+{
+    "contractId": "CONTRACT-001",
+    "contractValue": 50000
+}
+
+###
+
+### =============================================================================
+### 3. QUERY PARAMETER CONTROL (?simulate=)
+### =============================================================================
+
+### Simulate error via query parameter
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG?simulate=error
+Accept: application/json
+
+###
+
+### Simulate timeout via query parameter
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG?simulate=timeout
+Accept: application/json
+
+###
+
+### Simulate slow response via query parameter
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG?simulate=slow
+Accept: application/json
+
+###
+
+### Simulate not-found via query parameter
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG?simulate=not-found
+Accept: application/json
+
+###
+
+### =============================================================================
+### 4. ID-BASED CONTROL (Keywords in ID)
+### =============================================================================
+
+### Account with FAIL in ID - Returns 500 error
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001FAIL000003DGb2
+Accept: application/json
+
+###
+
+### Account with TIMEOUT in ID - Returns after 30s delay
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001TIMEOUT0003DGb2
+Accept: application/json
+
+###
+
+### Account with SLOW in ID - Returns after 5s delay
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001SLOW00003DGb2YA
+Accept: application/json
+
+###
+
+### Account with NOTFOUND in ID - Returns 404
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001NOTFOUND003DGb2
+Accept: application/json
+
+###
+
+### Account with UNAUTH in ID - Returns 401
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001UNAUTH0003DGb2Y
+Accept: application/json
+
+###
+
+### Contact with FAIL in ID - Returns 500 error
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Contact/003FAIL000004TmiD
+Accept: application/json
+
+###
+
+### Contact with TIMEOUT in ID - Returns after 30s delay
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Contact/003TIMEOUT004TmiD
+Accept: application/json
+
+###
+
+### =============================================================================
+### 5. CUSTOM RESPONSE DATA (via Headers)
+### =============================================================================
+
+### Customize Account response with specific name
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Account-Name: Contoso Corporation
+
+###
+
+### Customize multiple Account fields
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Account-Name: Fabrikam Industries
+X-Mock-Account-Industry: Manufacturing
+X-Mock-Account-Revenue: 75000000
+X-Mock-Account-Employees: 1200
+
+###
+
+### Customize Account with different values
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Account-Name: Northwind Traders
+X-Mock-Account-Industry: Retail
+X-Mock-Account-Revenue: 25000000
+X-Mock-Account-Employees: 350
+
+###
+
+### =============================================================================
+### 6. ADMIN & HEALTH ENDPOINTS
+### =============================================================================
+
+### Health check
+GET {{baseUrl}}/health
+Accept: application/json
+
+###
+
+### View all WireMock mappings (built-in admin)
+GET {{baseUrl}}/__admin/mappings
+Accept: application/json
+
+###
+
+### View WireMock requests log
+GET {{baseUrl}}/__admin/requests
+Accept: application/json
+
+###
+
+### Reset WireMock request log
+DELETE {{baseUrl}}/__admin/requests
+Accept: application/json
+
+###
+
+### =============================================================================
+### 7. COMBINED EXAMPLES (Real-world scenarios)
+### =============================================================================
+
+### Scenario: Test error handling with custom account
+### First, this succeeds:
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Account-Name: Test Company
+
+###
+
+### Then, simulate the same call failing:
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+X-Mock-Account-Name: Test Company
+X-Mock-Response: fail
+
+###
+
+### Scenario: Contract validation flow
+### Step 1: Get account info
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG
+Accept: application/json
+
+###
+
+### Step 2: Validate contract (will auto-approve)
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/validate
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-2024-001",
+    "accountId": "001XX000003DGb2YAG",
+    "contractValue": 75000,
+    "currency": "USD",
+    "startDate": "2024-02-01",
+    "endDate": "2025-01-31"
+}
+
+###
+
+### Step 3: Send notification after signing
+POST {{baseUrl}}/services/data/{{apiVersion}}/contract/notify
+Content-Type: application/json
+
+{
+    "contractId": "CONTRACT-2024-001",
+    "accountId": "001XX000003DGb2YAG",
+    "signedBy": "John Smith",
+    "signedAt": "2024-01-20T14:30:00Z",
+    "documentUrl": "https://docs.example.com/contracts/2024-001.pdf"
+}
+
+###
+
+### =============================================================================
+### 8. CONTACTS BY ACCOUNT
+### =============================================================================
+
+### Get all contacts for an account
+GET {{baseUrl}}/services/data/{{apiVersion}}/sobjects/Account/001XX000003DGb2YAG/Contacts
+Accept: application/json
+
+###
